@@ -1,182 +1,227 @@
-# strapi-provider-email-mailjet
+---
 
-[Strapi](http://strapi.io/) email service for [Mailjet](https://mailjet.com/)
+# Strapi Provider Email - Novu
 
-# Prerequisites
+This is a custom email provider for Strapi that enables sending emails using Novu as the email service.
 
-You will need to have the plugin `strapi-plugin-email` installed in you Strapi project.
+## Installation
 
-# Installation
+Install the package via npm or yarn:
 
+```bash
+# npm
+npm install strapi-provider-email-novu
+
+# yarn
+yarn add strapi-provider-email-novu
 ```
-# using yarn
-yarn add strapi-provider-email-mailjet
 
-# using npm
-npm i strapi-provider-email-mailjet
+## Configuration
+
+To configure the Novu email provider in your Strapi project, follow these steps:
+
+1. Install the `strapi-provider-email-novu` package:
+
+```bash
+# npm
+npm install strapi-provider-email-novu
+
+# yarn
+yarn add strapi-provider-email-novu
 ```
 
-# Configuration
+2. In your Strapi project, create a new file called `config/plugins.js` (if it doesn't already exist).
 
-| Variable                     | Type   | Description                                                                                   | Required | Default   |
-| ---------------------------- | ------ | --------------------------------------------------------------------------------------------- | -------- | --------- |
-| provider                     | string | The name of the provider you use                                                              | yes      |           |
-| providerOptions              | object | Provider options                                                                              | yes      |           |
-| providerOptions.publicApiKey | string | Mailjet public API key. See your [MailJet API keys](https://app.mailjet.com/account/api_keys) | yes      |           |
-| providerOptions.secretApiKey | string | Mailjet secret API key. See your [MailJet API keys](https://app.mailjet.com/account/api_keys) | yes      |           |
-| settings                     | object | Settings                                                                                      | no       | {}        |
-| settings.defaultFrom         | string | Default sender mail address                                                                   | yes      | undefined |
-| settings.defaultFromName     | string | Default sender name                                                                           | yes      | undefined |
-| settings.defaultTo           | string | Default receiver mail address                                                                 | yes      | undefined |
-| settings.defaultToName       | string | Default receiver name                                                                         | yes      | undefined |
-
-### Example config file
-
-Path - `config/plugins.js`
+3. Add the following configuration to the `config/plugins.js` file:
 
 ```javascript
 module.exports = ({ env }) => ({
-  // ...
+  // Other plugins configuration
+
   email: {
-    config: {
-      provider: "strapi-provider-email-mailjet",
-        providerOptions: {
-          publicApiKey: env("MAILJET_PUBLIC_KEY"),
-          secretApiKey: env("MAILJET_SECRET_KEY"),
-        },
-        settings: {
-          defaultFrom: "scott@ijs.to",
-          defaultFromName: "Scott from iJS.to",
-          defaultTo: "john.doe@ijs.to",
-          defaultToName: "Johnny Bravodoe",
-        },
-      },
-      // ...
-    }
+    provider: 'novu',
+    providerOptions: {
+      novuApiKey: process.env.NOVU_API_KEY,
+    },
+    settings: {
+      defaultFrom: 'your-email@your-domain.com',
+      defaultReplyTo: 'your-email@your-domain.com',
+    },
+  },
 });
 ```
 
-# API
+Make sure to adjust `process.env.NOVU_API_KEY` with your preferred method of retrieving the Novu API key.
 
-Strapi Mailjet Plugin enables you to interact with Mailjet API via custom methods listed below.
+## Usage
 
-This API is a subset of the [MailJet API](https://dev.mailjet.com/email/reference/).
-
-## Sending API
-
-You can easily send emails via
-
-### Usage example
-
-**Single recipient**
+Now you can use the default Strapi email methods (`strapi.plugins['email'].services.email.send()`) to send emails using Novu as the email provider. For example:
 
 ```javascript
-await strapi.plugins.email.services.email.send({
-  to: "scott@ijs.to",
-  toName: "Scott Agirs",
-  subject: "👋 Hey there!",
-  text: `Text version of your email`,
-  html: `<html />`,
-});
-```
-
-**Multiple recipients**
-
-Note taht `toName` is not used here, instead it's added to each recipient object of the array.
-
-```javascript
-await strapi.plugins.email.services.email.send({
+await strapi.plugins['email'].services.email.send({
   to: [
-    { email: "scott@ijs.to", toName: "Scott Agirs" },
-    { email: "chili@spice.oo", toName: "🦄" },
+    {
+      subscriberId: '111',
+      email: 'john.doe@domain.com',
+      firstName: 'John',
+      lastName: 'Doe',
+    },
   ],
-  subject: "👋 Hey y'all!",
-  text: `Text version of your email`,
-  html: `<html />`,
+  from: 'your-email@your-domain.com',
+  subject: 'Hello World',
+  text: 'This is the text version of the email.',
+  html: '<p>This is the HTML version of the email.</p>',
 });
 ```
+
+Make sure to adjust the values of `to`, `subscriberId`, `email`, `firstName`, `lastName`, `from`, `subject`, `text`, and `html` according to your specific use case.
 
 ## Custom Methods
 
-You can request additional actions by submitting a Feature Request or a Pull Request.
+You can interact with the Novu API via custom methods provided by the Novu SDK. The following custom methods are available:
+
+### `addContactToList`
+
+Adds a contact to a specific list.
 
 ### Usage example
-
-> Note: To access the custom methods API, you need to call it vai `strapi.plugins.email.provider.CUSTOM_METHOD` and NOT `strapi.plugins.email.services.email.CUSTOM_METHOD`
 
 ```javascript
 await strapi.plugins.email.provider
   .addContactToList({
-    id: "email@example.com",
-    listId: "mailingListId",
+    id: 'email@example.com',
+    listId: 'mailingListId',
   })
   .catch((error) => console.log(error))
   .then((response) => console.log(response));
 ```
 
-### **addContactToList**
+### `createContact`
 
-| Field  | Type   | Description                          | Required | Default |
-| ------ | ------ | ------------------------------------ | -------- | ------- |
-| listId | String | MailJet List ID to which add contact | yes      |         |
-| id     | String | Contact's email or MailJet ID        | yes      |         |
+Creates a new contact with the specified email and name.
 
-### **createContact**
+### Usage example
 
-| Field | Type   | Description              | Required | Default |
-| ----- | ------ | ------------------------ | -------- | ------- |
-| email | String | Contact's email          | yes      |         |
-| name  | String | Full name of the contact | no       |         |
+```javascript
+await strapi.plugins.email.provider
+  .createContact({
+    email: 'email@example.com',
+    name: 'John Doe',
+  })
+  .catch((error) => console.log(error))
+  .then((response) => console.log(response));
+```
 
-### **updateContact**
+### `updateContact`
 
-| Field | Type   | Description                                                                                                                           | Required | Default |
-| ----- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
-| data  | object | Contact Metadata. [API Reference](https://dev.mailjet.com/email/reference/contacts/contact-properties/#v3_put_contactdata_contact_ID) | yes      |         |
-| id    | String | Contact's email or MailJet ID                                                                                                         | yes      |         |
+Updates an existing contact with the specified data.
 
-### **createContactList**
+### Usage example
 
-| Field | Type   | Description              | Required | Default |
-| ----- | ------ | ------------------------ | -------- | ------- |
-| name  | String | Name of the contact list | yes      |         |
+```javascript
+await strapi.plugins.email.provider
+  .updateContact('contactId', {
+    data: {
+      customField: 'customValue',
+    },
+  })
+  .catch((error) => console.log(error))
+  .then((response) => console.log
 
-### **removeContactFromList**
+(response));
+```
 
-| Field  | Type   | Description                                  | Required | Default |
-| ------ | ------ | -------------------------------------------- | -------- | ------- |
-| listId | String | MailJet List ID from which to remove contact | yes      |         |
-| id     | String | Contact's email or MailJet ID                | yes      |         |
+### `createContactList`
 
-### **retrieveContact**
+Creates a new contact list with the specified name.
 
-| Field     | Type   | Description                   | Required | Default |
-| --------- | ------ | ----------------------------- | -------- | ------- |
-| contactId | String | Contact's email or MailJet ID | yes      |         |
+### Usage example
 
-### **subscribeContactToList**
+```javascript
+await strapi.plugins.email.provider
+  .createContactList({
+    name: 'My Contact List',
+  })
+  .catch((error) => console.log(error))
+  .then((response) => console.log(response));
+```
 
-Use this to re-subscribe existing contact.
+### `removeContactFromList`
 
-| Field  | Type   | Description                                       | Required | Default |
-| ------ | ------ | ------------------------------------------------- | -------- | ------- |
-| listId | String | MailJet List ID to which to subscribe the contact | yes      |         |
-| id     | String | Contact's email or MailJet ID                     | yes      |         |
+Removes a contact from a specific list.
 
-### **unsubscribeContactFromList**
+### Usage example
 
-| Field  | Type   | Description                                       | Required | Default |
-| ------ | ------ | ------------------------------------------------- | -------- | ------- |
-| listId | String | MailJet List ID from which to unsubscribe contact | yes      |         |
-| id     | String | Contact's email or MailJet ID                     | yes      |         |
+```javascript
+await strapi.plugins.email.provider
+  .removeContactFromList({
+    listId: 'mailingListId',
+    id: 'contactId',
+  })
+  .catch((error) => console.log(error))
+  .then((response) => console.log(response));
+```
+
+### `retrieveContact`
+
+Retrieves information about a specific contact.
+
+### Usage example
+
+```javascript
+await strapi.plugins.email.provider
+  .retrieveContact('contactId')
+  .catch((error) => console.log(error))
+  .then((response) => console.log(response));
+```
+
+### `subscribeContactToList`
+
+Subscribes an existing contact to a specific list.
+
+### Usage example
+
+```javascript
+await strapi.plugins.email.provider
+  .subscribeContactToList({
+    listId: 'mailingListId',
+    id: 'contactId',
+  })
+  .catch((error) => console.log(error))
+  .then((response) => console.log(response));
+```
+
+### `unsubscribeContactFromList`
+
+Unsubscribes a contact from a specific list.
+
+### Usage example
+
+```javascript
+await strapi.plugins.email.provider
+  .unsubscribeContactFromList({
+    listId: 'mailingListId',
+    id: 'contactId',
+  })
+  .catch((error) => console.log(error))
+  .then((response) => console.log(response));
+```
 
 ---
 
-# Licence
+## Contributing
 
-- [MIT](https://github.com/ijsto/strapi-provider-email-mailjet/blob/master/LICENSE.md)
+Feel free to contribute to this repository by submitting a pull request.
+
+## License
+
+This repository is [MIT licensed](LICENSE).
+
+---
 
 ### Credits
+
+Please note that the above README has been adapted from the `strapi-provider-email-mailjet` README to fit the Novu email provider.
 
 Authors:
 [Scott Agirs](https://github.com/scottagirs)
