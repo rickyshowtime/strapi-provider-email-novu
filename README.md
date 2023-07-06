@@ -39,9 +39,9 @@ module.exports = ({ env }) => ({
   // Other plugins configuration
 
   email: {
-    provider: 'novu',
+    provider: 'strapi-provider-email-novu',
     providerOptions: {
-      novuApiKey: process.env.NOVU_API_KEY,
+      novuApiKey: env("NOVU_API_KEY"),
     },
     settings: {
       defaultFrom: 'your-email@your-domain.com',
@@ -55,26 +55,43 @@ Make sure to adjust `process.env.NOVU_API_KEY` with your preferred method of ret
 
 ## Usage
 
-Now you can use the default Strapi email methods (`strapi.plugins['email'].services.email.send()`) to send emails using Novu as the email provider. For example:
+The `strapi-provider-email-novu` package provides the following methods:
+
+### `send(options)`
+
+Sends an email using Novu.
+
+- `options`: An object containing the email parameters.
+  - `to`: The recipient of the email. It can be an object with `subscriberId`, `email`, `firstName`, and `lastName` properties, or an array of recipient objects.
+  - `from`: The sender's email address.
+  - `fromName`: The sender's name.
+  - `subject`: The subject of the email.
+  - `text`: The plain text version of the email.
+  - `html`: The HTML version of the email.
+  - `eventName`: The trigger identifier of the Novu workflow.
+  - `payload`: Additional custom information to pass to the Novu workflow. please refer to https://docs.novu.co/platform/workflows for more information
+
+Example usage:
 
 ```javascript
 await strapi.plugins['email'].services.email.send({
-  to: [
-    {
-      subscriberId: '111',
-      email: 'john.doe@domain.com',
-      firstName: 'John',
-      lastName: 'Doe',
-    },
-  ],
-  from: 'your-email@your-domain.com',
-  subject: 'Hello World',
-  text: 'This is the text version of the email.',
-  html: '<p>This is the HTML version of the email.</p>',
+  to: {
+    subscriberId: 'SUBSCRIBER_ID',
+    email: 'recipient@example.com',
+    firstName: 'John',
+    lastName: 'Doe',
+  },
+  from: 'sender@example.com',
+  fromName: 'Sender Name',
+  subject: 'Hello from Novu',
+  text: 'Plain text version of the email',
+  html: '<p>HTML version of the email</p>',
+  eventName: 'EVENT_NAME_FROM_ADMIN_PANEL',
+  payload: {
+    customVariables: 'VALUE_OR_OBJECT',
+  },
 });
 ```
-
-Make sure to adjust the values of `to`, `subscriberId`, `email`, `firstName`, `lastName`, `from`, `subject`, `text`, and `html` according to your specific use case.
 
 ## Custom Methods
 
