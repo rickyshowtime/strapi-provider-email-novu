@@ -1,3 +1,4 @@
+
 ---
 
 # Strapi Provider Email - Novu
@@ -223,8 +224,6 @@ await strapi.plugins.email.provider
   .catch((error) => console.log(error))
   .then((response) => console.log(response));
 ```
-
----
 
 ## Contributing
 

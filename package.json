@@ -1,5 +1,6 @@
 {
   "name": "strapi-provider-email-novu",
+  "private": true,
   "version": "1.0.0",
   "description": "Strapi Email service provider for Novu",
   "author": {
@@ -26,7 +27,8 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.6",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "validator": "^13.9.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
