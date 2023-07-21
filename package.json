@@ -1,7 +1,7 @@
 {
   "name": "strapi-provider-email-novu",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Strapi Email service provider for Novu",
   "author": {
     "email": "eric.chautems@kooko.ch",
