@@ -39,6 +39,15 @@
     "email",
     "novu"
   ],
+  "engines": {
+    "node": "18.x.x",
+    "npm": "please-use-yarn",
+    "yarn": ">= 1.22.19"
+  },
+  "volta": {
+    "node": "18.16.0",
+    "yarn": "1.22.19"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
